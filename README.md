@@ -83,9 +83,14 @@ pip install -r requirements.txt
 
 ## Configuration
 
-The project does not require environment variables or `.env` files to run locally. Django uses the configuration in `calculator/settings.py` and Django's default SQLite database.
+The project does not require environment variables or `.env` files to run locally. Django uses the configuration in `calculator/settings.py` and Django's default SQLite database. For production, configure these environment variables in the hosting platform:
 
-Do not commit virtual environments, the generated local database (`db.sqlite3`), cache files, or production secrets. Before deployment, change `DEBUG`, configure `ALLOWED_HOSTS`, and manage secrets outside the repository.
+| Variable | Purpose | Required in production |
+| --- | --- | --- |
+| `DJANGO_SECRET_KEY` | Django secret key. | Yes |
+| `DJANGO_DEBUG` | Enables debug mode when set to `true`; defaults to `false` on Vercel. | No |
+
+Do not commit virtual environments, the generated local database (`db.sqlite3`), cache files, or production secrets. Before deployment, configure `DJANGO_SECRET_KEY` and manage secrets outside the repository. `ALLOWED_HOSTS` already includes Vercel domains.
 
 ## Commands
 
