@@ -22,7 +22,6 @@ def jacobi(request):
             A_string = request.POST.get('A')
             b_string = request.POST.get('b')
             x0_string = request.POST.get('x0')
-            Tol = float(request.POST.get('tolerance'))
             niter = int(request.POST.get('iterations_limit'))
             error_type = request.POST.get('error_type', "relative")
             tolerance_input = request.POST.get('tolerance').replace(',', '.')
@@ -43,6 +42,8 @@ def jacobi(request):
             # Validar las entradas
             if not MatricesManager.is_square_matrix(A):
                 raise ValueError("The matrix A must be square.")
+            if MatricesManager.has_zero_diagonal(A):
+                raise ValueError("The matrix A cannot contain zeros on its diagonal for this iterative method.")
             if not MatricesManager.are_dimensions_compatible(A, b, x0):
                 raise ValueError("The dimensions of A, b and x0 are not compatible.")
 
@@ -59,7 +60,6 @@ def jacobi(request):
             return render(request, "systems_equations/jacobi.html", {"template_data": template_data})
         
         else:
-            template_data["response"] = ResponseManager.error_response("All the inputs must have a value.")
             return render(request, "systems_equations/jacobi.html", {"template_data": template_data})
 
     except Exception as e:
@@ -103,6 +103,8 @@ def gauss_seidel(request):
             # Validar las entradas
             if not MatricesManager.is_square_matrix(A):
                 raise ValueError("The matrix A must be square.")
+            if MatricesManager.has_zero_diagonal(A):
+                raise ValueError("The matrix A cannot contain zeros on its diagonal for this iterative method.")
             if not MatricesManager.are_dimensions_compatible(A, b, x0):
                 raise ValueError("The dimensions of A, b, and x0 are not compatible.")
 
@@ -168,6 +170,8 @@ def sor(request):
             # Validate inputs
             if not MatricesManager.is_square_matrix(A):
                 raise ValueError("The matrix A must be square.")
+            if MatricesManager.has_zero_diagonal(A):
+                raise ValueError("The matrix A cannot contain zeros on its diagonal for this iterative method.")
             if not MatricesManager.are_dimensions_compatible(A, b, x0):
                 raise ValueError("The dimensions of A, b, and x0 are not compatible.")
             if not (0 < w < 2):

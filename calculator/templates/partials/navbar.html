@@ -1,28 +1,19 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-body">
-    <div class="container-fluid">
-
-        <a class="navbar-brand" href="{% url 'home' %}">Numerical Analysis Calculator</a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <a class="flex items-center gap-3 no-underline" href="{% url 'home' %}">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-primary font-stack text-lg font-bold text-white shadow-sm">∫</span>
+            <span class="font-stack text-base font-semibold tracking-tight text-slate-900 sm:text-lg">Numerical Analysis <span class="text-primary">Calculator</span></span>
+        </a>
+        <button class="navbar-toggler border-0 p-2 shadow-none lg:hidden" type="button" data-bs-toggle="collapse" data-bs-target="#site-navigation" aria-controls="site-navigation" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-current="page" href="{% url 'home' %}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'guide' %}active{% endif %}" href="{% url 'guide' %}">Guide</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'problems' %}active{% endif %}" href="{% url 'problems' %}">Problems</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a>
-                </li>
+        <div class="collapse navbar-collapse lg:!flex lg:!basis-auto" id="site-navigation">
+            <ul class="navbar-nav ms-auto mt-3 gap-1 lg:mt-0 lg:flex-row lg:items-center">
+                <li class="nav-item"><a class="nav-link rounded-lg px-3 py-2 font-stack text-sm {% if request.resolver_match.url_name == 'home' %}bg-blue-50 text-primary{% else %}text-slate-600 hover:bg-slate-100 hover:text-primary{% endif %}" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link rounded-lg px-3 py-2 font-stack text-sm {% if request.resolver_match.url_name == 'guide' %}bg-blue-50 text-primary{% else %}text-slate-600 hover:bg-slate-100 hover:text-primary{% endif %}" href="{% url 'guide' %}">Guide</a></li>
+                <li class="nav-item"><a class="nav-link rounded-lg px-3 py-2 font-stack text-sm {% if request.resolver_match.url_name == 'problems' %}bg-blue-50 text-primary{% else %}text-slate-600 hover:bg-slate-100 hover:text-primary{% endif %}" href="{% url 'problems' %}">Problems</a></li>
+                <li class="nav-item"><a class="nav-link rounded-lg px-3 py-2 font-stack text-sm {% if request.resolver_match.url_name == 'about' %}bg-blue-50 text-primary{% else %}text-slate-600 hover:bg-slate-100 hover:text-primary{% endif %}" href="{% url 'about' %}">About</a></li>
             </ul>
         </div>
-
     </div>
 </nav>

@@ -1,7 +1,6 @@
 {% extends 'interpolation/base_methods.html' %}
 
 {% block input_section %}
-<h1>{{ title }}</h1> <!-- Add this line to display the title -->
 <form action="{% url 'methods.vandermonde' %}" method="POST">
     {% csrf_token %}
     <div class="mb-3">
@@ -23,7 +22,7 @@
 {% endblock input_section %}
 
 {% block results_section %}
-    {% if matrix %}
+    {% if template_data.matrix %}
         <h3>Vandermonde Matrix</h3>
         <table class="table">
             <thead>
@@ -33,7 +32,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for row in matrix %}
+                {% for row in template_data.matrix %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ row|join:", " }}</td>
@@ -43,12 +42,12 @@
         </table>
     {% endif %}
 
-    {% if polynomial %}
+    {% if template_data.polynomial %}
         <h3>Polynomial</h3>
-        <p>{{ polynomial }}</p>
+        <p>{{ template_data.polynomial }}</p>
     {% endif %}
 
-    {% if coefficients %}
+    {% if template_data.coefficients %}
         <h3>Coefficients</h3>
         <table class="table">
             <thead>
@@ -58,7 +57,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for term, coeff in table %}
+                {% for term, coeff in template_data.table %}
                     <tr>
                         <td>{{ term }}</td>
                         <td>{{ coeff }}</td>

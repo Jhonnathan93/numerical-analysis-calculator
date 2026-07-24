@@ -37,10 +37,18 @@ def bisection(request):
 
             if response["status"] == "success":
                 approximate_root = response["table"][-1][3]  # c value
+                approximate_value = response["table"][-1][4]  # f(c) value
                 plot_a = a
                 plot_b = b
 
-                template_data["plot_data"] = PlotManager.plot_graph(response, function, plot_a, plot_b)
+                template_data["plot_data"] = PlotManager.plot_graph(
+                    response,
+                    function,
+                    plot_a,
+                    plot_b,
+                    approximate_x=approximate_root,
+                    approximate_y=approximate_value,
+                )
 
             return render(request, 'non_linear_equations/bisection.html', {'template_data': template_data})
         else:
@@ -88,10 +96,15 @@ def fixed_point(request):
             template_data["response"] = response
 
             # Preparar datos para la gráfica
-            approximate_root = response["table"][-1][1]
-            plot_a = approximate_root - 1
-            plot_b = approximate_root + 1
-            template_data["plot_data"] = PlotManager.plot_graph(response, g_function, plot_a, plot_b)
+            if response["status"] == "success":
+                approximate_root = response["table"][-1][1]
+                approximate_value = response["table"][-1][2]
+                plot_a = approximate_root - 1
+                plot_b = approximate_root + 1
+                template_data["plot_data"] = PlotManager.plot_graph(
+                    response, g_function, plot_a, plot_b,
+                    approximate_x=approximate_root, approximate_y=approximate_value,
+                )
 
             return render(request, "non_linear_equations/fixed_point.html", {"template_data": template_data})
         else:
@@ -139,10 +152,17 @@ def false_position(request):
             template_data["response"] = response
 
             # Preparar datos para la gráfica
+            if response["status"] != "success":
+                return render(request, "non_linear_equations/false_position.html", {"template_data": template_data})
+
             approximate_root = response["table"][-1][3]  # 'c' está en la columna 3
+            approximate_value = response["table"][-1][4]
             plot_a = approximate_root - 1
             plot_b = approximate_root + 1
-            template_data["plot_data"] = PlotManager.plot_graph(response, function, plot_a, plot_b)
+            template_data["plot_data"] = PlotManager.plot_graph(
+                response, function, plot_a, plot_b,
+                approximate_x=approximate_root, approximate_y=approximate_value,
+            )
 
             return render(request, "non_linear_equations/false_position.html", {"template_data": template_data})
         else:
@@ -184,6 +204,9 @@ def newton_raphson(request):
                 function_str, x0, tol, iterations_limit, error_type
             )
             template_data["response"] = response
+
+            if response["status"] != "success":
+                return render(request, 'non_linear_equations/newton_raphson.html', {'template_data': template_data})
 
             approximate_root = response["table"][-1][1]
             plot_a = approximate_root - 1
@@ -232,6 +255,9 @@ def secant(request):
             )
 
             template_data["response"] = response
+
+            if response["status"] != "success":
+                return render(request, "non_linear_equations/secant.html", {"template_data": template_data})
 
             approximate_root = response["table"][-1][1]
 

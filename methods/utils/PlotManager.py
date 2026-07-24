@@ -11,9 +11,11 @@ from io import BytesIO
 
 class PlotManager:
     @staticmethod
-    def plot_graph(response_data, function, a: float = None, b: float = None):
-        aproximate_x = response_data["table"][-1][1]
-        aproximate_y = response_data["table"][-1][2]
+    def plot_graph(response_data, function, a: float = None, b: float = None, approximate_x=None, approximate_y=None):
+        if approximate_x is None:
+            approximate_x = response_data["table"][-1][1]
+        if approximate_y is None:
+            approximate_y = response_data["table"][-1][2]
 
         x_values = np.linspace(a, b, 1000).tolist()
         y_values = [function(x) for x in x_values]
@@ -21,8 +23,8 @@ class PlotManager:
         return {
             "x": json.dumps(x_values),
             "y": json.dumps(y_values),
-            "aproximate_x": aproximate_x,
-            "aproximate_y": aproximate_y,
+            "aproximate_x": approximate_x,
+            "aproximate_y": approximate_y,
             "function": function,
         }
 
@@ -191,6 +193,16 @@ class PlotManager:
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         ax.set_title('Cubic Spline Interpolation')
+        ax.legend()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        image_png = buf.getvalue()
+        buf.close()
+        plt.close(fig)
+
+        return base64.b64encode(image_png).decode('utf-8')
     
     @staticmethod
     def plot_lagrange(x, y):

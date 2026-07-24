@@ -1,54 +1,120 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=Stack+Sans+Text:wght@200..700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YtY2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        quicksand: ['Quicksand', 'sans-serif'],
+                        stack: ['Stack Sans Text', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1E3A8A',
+                        accent: '#F59E0B',
+                        neutral: '#374151',
+                        background: '#F9FAFB',
+                    },
+                },
+            },
+        };
+    </script>
     <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
-    <title>Numerical Analysis Calculator</title>
     <style>
-        .main-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-top: 40px;
-            padding-bottom: 40px;
+        /* Fallback styles used while external Tailwind CSS is loading. */
+        body { min-height: 100vh; margin: 0; background: #F9FAFB; color: #374151; font-family: Quicksand, sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-stack { font-family: "Stack Sans Text", sans-serif; }
+        .app-main { width: 100%; max-width: 1280px; margin: 0 auto; padding: 2rem 1rem; }
+        .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid #e2e8f0; }
+        .page-heading h1 { margin: 0; color: #0f172a; font-size: clamp(1.5rem, 3vw, 1.875rem); font-weight: 600; }
+        .eyebrow { margin: 0 0 .35rem; color: #1E3A8A; font-family: "Stack Sans Text", sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
+        .calculator-card { padding: 1.5rem; border: 1px solid #cbd5e1; border-radius: 1rem; background: #fff; box-shadow: 0 1px 2px rgb(15 23 42 / .05); }
+        .section-title { display: flex; align-items: center; gap: .75rem; margin: 0 0 1.25rem; color: #0f172a; font-size: 1.125rem; font-weight: 600; }
+        .section-title::before { width: .25rem; height: 1.5rem; border-radius: 999px; background: #F59E0B; content: ""; }
+        .form-control, .form-select { display: block; width: 100%; border: 1px solid #94a3b8; border-radius: .75rem; background: #fff; color: #1e293b; }
+        .form-control:focus, .form-select:focus { border-color: #1E3A8A; outline: 3px solid rgb(30 58 138 / .15); box-shadow: none; }
+        .btn-primary { border: 1px solid #1e3a8a; background: #1E3A8A; color: #fff; }
+        .btn-outline-primary { border: 1px solid #94a3b8; background: #fff; color: #1E3A8A; }
+        .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin: 0; padding: 0; background: transparent; border-radius: 0; list-style: none; }
+        .breadcrumb-item { display: flex; align-items: center; gap: .35rem; white-space: nowrap; }
+        .breadcrumb-item + .breadcrumb-item::before { padding: 0; color: #94a3b8; content: ">"; }
+        .table-responsive { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: .75rem; }
+        @media (min-width: 640px) { .app-main { padding-right: 1.5rem; padding-left: 1.5rem; } }
+    </style>
+    <style type="text/tailwindcss">
+        @layer base {
+            body { @apply min-h-screen bg-background font-quicksand text-neutral antialiased; }
+            h1, h2, h3, h4, h5, h6 { @apply font-stack text-slate-900; }
         }
-        .breadcrumb-item + .breadcrumb-item::before {
-            content: ">";
+
+        @layer components {
+            .app-main { @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8; }
+            .page-heading { @apply mb-6 flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between; }
+            .page-heading h1 { @apply m-0 text-2xl font-semibold tracking-tight sm:text-3xl; }
+            .eyebrow { @apply font-stack text-xs font-semibold uppercase tracking-[0.18em] text-primary; }
+            .breadcrumb { @apply m-0 flex flex-wrap items-center gap-1 bg-transparent p-0 text-sm; }
+            .breadcrumb-item { @apply flex items-center gap-1 whitespace-nowrap; }
+            .breadcrumb-item + .breadcrumb-item::before { content: ">"; @apply p-0 text-slate-400; }
+            .breadcrumb-item a { @apply text-primary no-underline hover:text-accent; }
+            .breadcrumb-item.active { @apply text-slate-500; }
+            .calculator-card { @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6; }
+            .section-title { @apply mb-5 flex items-center gap-3 font-stack text-lg font-semibold text-slate-900; }
+            .section-title::before { content: ""; @apply h-6 w-1 rounded-full bg-accent; }
+            .form-label { @apply mb-2 font-stack text-sm font-medium text-slate-700; }
+            .form-control, .form-select { @apply rounded-xl border border-slate-400 px-3 py-2.5 text-slate-800 shadow-none transition placeholder:text-slate-400 focus:border-primary focus:ring-4 focus:ring-blue-100; }
+            textarea.form-control { @apply min-h-24; }
+            .form-text { @apply mt-1 text-xs text-slate-500; }
+            .btn-primary { @apply rounded-xl border border-primary bg-primary px-4 py-2.5 font-stack text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:ring-4 focus:ring-blue-200; }
+            .btn-outline-primary { @apply rounded-xl border border-slate-400 bg-white px-4 py-3 font-stack text-primary shadow-sm transition hover:border-primary hover:bg-primary hover:text-white; }
+            .alert { @apply mb-6 rounded-xl border-0 px-4 py-3 font-medium shadow-sm; }
+            .alert-success { @apply bg-emerald-50 text-emerald-800; }
+            .alert-warning { @apply bg-amber-50 text-amber-800; }
+            .alert-danger { @apply bg-rose-50 text-rose-800; }
+            .table-responsive { @apply overflow-x-auto rounded-xl border border-slate-200; }
+            .table { @apply mb-0 text-sm; }
+            .table thead th { @apply whitespace-nowrap border-b border-slate-200 bg-slate-50 px-4 py-3 font-stack text-xs font-semibold uppercase tracking-wide text-slate-600; }
+            .table tbody td { @apply border-slate-100 px-4 py-3 align-middle text-slate-700; }
+            .table tbody tr { @apply transition hover:bg-blue-50/40; }
         }
     </style>
+    <title>{% if template_data.title %}{{ template_data.title }} · {% endif %}Numerical Analysis Calculator</title>
 </head>
-<body class="index-page">
+<body class="flex flex-col">
     {% include 'partials/navbar.html' %}
-    
-    <div class="main-container">
-        
-        <div class="text-center" style="margin-bottom: 10px;">
-            <h1>{{ template_data.title }}</h1>
-        </div>
-        <main class="main container">
-            <nav aria-label="breadcrumb" class="d-flex justify-content-center mb-3">
-                <ol class="breadcrumb">
-                    {% for name, link in template_data.breadcrumbs %}
-                        {% if forloop.last %}
-                            <li class="breadcrumb-item active" aria-current="page">{{ name }}</li>
-                        {% else %}
-                            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
-                        {% endif %}
-                    {% endfor %}
-                </ol>
-            </nav>
-            {% block body %}
-            {% endblock body %}
-        </main>
-    </div>
-
+    <main class="app-main flex-1">
+        {% if template_data.title != 'Home' %}
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">Numerical analysis workspace</p>
+                    <h1>{{ template_data.title|default:"Numerical Analysis Calculator" }}</h1>
+                </div>
+                {% if template_data.breadcrumbs %}
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            {% for name, link in template_data.breadcrumbs %}
+                                {% if forloop.last %}
+                                    <li class="breadcrumb-item active" aria-current="page">{{ name }}</li>
+                                {% else %}
+                                    <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </nav>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% block body %}{% endblock body %}
+    </main>
     {% include 'partials/footer.html' %}
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

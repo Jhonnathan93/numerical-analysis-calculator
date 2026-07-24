@@ -210,13 +210,13 @@ class InterpolationMethods:
         }
 
         # Response message and structure
-        response = {
-            'table': table,
-            'message': f"Lagrange interpolation completed successfully. Interpolated value at x = {x_to_interpolate} is {interpolated_value}.",
-            'headers': headers,
-            'plot_data': plot_data,
-            'interpolated_value': interpolated_value
-        }
+        response = ResponseManager.success_response(
+            table,
+            f"Lagrange interpolation completed successfully. Interpolated value at x = {x_to_interpolate} is {interpolated_value}.",
+            headers,
+        )
+        response['plot_data'] = plot_data
+        response['interpolated_value'] = interpolated_value
 
         return response
 

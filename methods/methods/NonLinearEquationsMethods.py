@@ -63,6 +63,18 @@ class NonLinearEquationsMethods:
 
         headers = ['Iteration', 'a', 'b', 'c', 'f(c)', 'Error']
 
+        # A root at either endpoint is already an exact solution. Handling it
+        # before iterating also preserves the bisection interval invariant.
+        if abs(fa) <= tolerance:
+            table.append([0, a, b, a, fa, 0.0])
+            message = f"An exact root was found at the left endpoint: c = {a} with f(c) = {fa}"
+            return ResponseManager.success_response(table, message, headers)
+
+        if abs(fb) <= tolerance:
+            table.append([0, a, b, b, fb, 0.0])
+            message = f"An exact root was found at the right endpoint: c = {b} with f(c) = {fb}"
+            return ResponseManager.success_response(table, message, headers)
+
         # Start iterations
         while error > tolerance and iteration < iterations_limit:
             c_prev = c  # Store previous c
@@ -144,6 +156,8 @@ class NonLinearEquationsMethods:
         # Agregar la primera iteración
         try:
             g_x0 = g_function(x0)
+            if not EquationsManager.is_valid_number(g_x0):
+                return ResponseManager.error_response("The fixed-point iteration produced a non-finite value. Choose a convergent g(x) and initial guess.")
             table.append([iteration, x0, g_x0, "N/A"])  # No hay error en la primera iteración
         except Exception as e:
             return ResponseManager.error_response(f"Error evaluating the function at x = {x0}: {e}")
@@ -152,6 +166,8 @@ class NonLinearEquationsMethods:
         while iteration < iterations_limit:
             try:
                 x1 = g_function(x0)
+                if not EquationsManager.is_valid_number(x1):
+                    return ResponseManager.error_response("The fixed-point iteration diverged and produced a non-finite value. Choose a convergent g(x) and initial guess.")
             except Exception as e:
                 return ResponseManager.error_response(f"Error evaluating the function at x = {x0}: {e}")
 
@@ -165,6 +181,8 @@ class NonLinearEquationsMethods:
             # Agregar los datos a la tabla
             try:
                 g_x1 = g_function(x1)
+                if not EquationsManager.is_valid_number(g_x1):
+                    return ResponseManager.error_response("The fixed-point iteration diverged and produced a non-finite value. Choose a convergent g(x) and initial guess.")
                 table.append([iteration + 1, x1, g_x1, error])
             except Exception as e:
                 return ResponseManager.error_response(f"Error evaluating the function at x = {x1}: {e}")
@@ -207,8 +225,36 @@ class NonLinearEquationsMethods:
         Returns:
         A response dictionary containing the status, message, table, etc.
         """
-        if function(a) * function(b) >= 0:
-            return ResponseManager.error_response("The function must have opposite signs at f(a) and f(b)")
+        if not EquationsManager.is_valid_number(a) or not EquationsManager.is_valid_number(b):
+            return ResponseManager.error_response("Both interval endpoints must be valid numbers.")
+        if not EquationsManager.is_valid_number(tolerance) or tolerance <= 0:
+            return ResponseManager.error_response("Tolerance must be a positive number.")
+        if not isinstance(iterations_limit, int) or iterations_limit <= 0:
+            return ResponseManager.error_response("Iterations limit must be a positive integer.")
+        if error_type not in ("relative", "absolute"):
+            return ResponseManager.error_response("Error type must be 'relative' or 'absolute'.")
+
+        try:
+            fa = function(a)
+            fb = function(b)
+        except Exception as e:
+            return ResponseManager.error_response(f"Error evaluating the function at interval endpoints: {e}")
+
+        headers = ["Iteration", "a", "b", "c", "f(c)", "Error"]
+        if abs(fa) <= tolerance:
+            return ResponseManager.success_response(
+                [[0, a, b, a, fa, 0.0]],
+                f"An exact root was found at the left endpoint: c = {a} with f(c) = {fa}",
+                headers,
+            )
+        if abs(fb) <= tolerance:
+            return ResponseManager.success_response(
+                [[0, a, b, b, fb, 0.0]],
+                f"An exact root was found at the right endpoint: c = {b} with f(c) = {fb}",
+                headers,
+            )
+        if fa * fb > 0:
+            return ResponseManager.error_response("The function must have opposite signs at f(a) and f(b).")
 
         iteration = 0  # Start from 0
         error = float('inf')  # Initialize the error as infinity for the first iteration
@@ -216,12 +262,15 @@ class NonLinearEquationsMethods:
         table = []
 
         # First iteration value
-        table.append([iteration, a, b, c, function(c), error])
+        table.append([iteration, a, b, c, fa, error])
 
         while iteration < iterations_limit:
             c_old = c
-            c = (a * function(b) - b * function(a)) / (function(b) - function(a))
-            fc = function(c)
+            c = (a * fb - b * fa) / (fb - fa)
+            try:
+                fc = function(c)
+            except Exception as e:
+                return ResponseManager.error_response(f"Error evaluating the function at c = {c}: {e}")
 
             # Calculate the error
             if iteration > 0:
@@ -238,20 +287,20 @@ class NonLinearEquationsMethods:
             # Check for convergence or tolerance
             if abs(fc) <= tolerance or error <= tolerance:
                 message = f"Converged to a root at x = {c} with f(x) = {fc}"
-                headers = ["Iteration", "a", "b", "c", "f(c)", "Error"]
                 return ResponseManager.success_response(table, message, headers)
 
             # Update the interval limits
-            if function(a) * fc < 0:
+            if fa * fc < 0:
                 b = c
+                fb = fc
             else:
                 a = c
+                fa = fc
 
             iteration += 1  # Increment iteration
 
         # If the method did not converge within the iteration limit
         message = f"Method did not converge after {iterations_limit} iterations."
-        headers = ["Iteration", "a", "b", "c", "f(c)", "Error"]
         return ResponseManager.warning_response(table, message, headers)
 
     @staticmethod

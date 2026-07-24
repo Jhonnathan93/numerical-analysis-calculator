@@ -50,7 +50,7 @@ f(x), method parameters, and tolerance -> numerical approximation and iteration 
 
 ## Prerequisites
 
-- Python 3.10 or later.
+- Python 3.12. Later Python versions have not been tested.
 - `pip`.
 - A modern web browser.
 

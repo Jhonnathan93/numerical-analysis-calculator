@@ -29,38 +29,18 @@ def vandermonde(request):
 
             # Call the Vandermonde method to compute the matrix and polynomial
             response = InterpolationMethods.vandermonde(x_values, y_values)
-
-            # Debugging lines (to check the output in the terminal)
-            print("First row of Vandermonde Matrix:", response['matrix'][1])
-            print("First coefficient of Polynomial:", response['coefficients'][1])
-            
-            # Add matrix, polynomial, and coefficients to the template context
-            template_data["matrix"] = response['matrix']
-            template_data["polynomial"] = response['polynomial']
-            template_data["coefficients"] = response['coefficients']
-
-            # Prepare table data for displaying coefficients, if needed
-            table = []
-            for i, coeff in enumerate(response['coefficients']):
-                table.append([f"x^{i}", f"{coeff:.4f}"])
-
-            # Add table data and headers for rendering in the template
-            template_data["table"] = table
-            template_data["headers"] = ['Term', 'Coefficient']
-
-            print("Template data:", template_data)  # Debugging line
-
-            return render(request, "interpolation/vandermonde.html", template_data)
+            template_data.update(response)
+            return render(request, "interpolation/vandermonde.html", {"template_data": template_data})
 
 
         else:
-            template_data["response"] = ResponseManager.error_response("All the inputs must have a value.")
-            return render(request, "interpolation/vandermonde.html", template_data)
+            return render(request, "interpolation/vandermonde.html", {"template_data": template_data})
 
 
     except Exception as e:
         template_data = ResponseManager.error_response(str(e))
-        return render(request, "interpolation/vandermonde.html", template_data)
+        template_data["title"] = "Vandermonde Method"
+        return render(request, "interpolation/vandermonde.html", {"template_data": template_data})
 
 
 

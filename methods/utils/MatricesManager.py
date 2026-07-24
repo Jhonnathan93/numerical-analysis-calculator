@@ -31,6 +31,10 @@ class MatricesManager:
         return matrix.shape[0] == matrix.shape[1]
 
     @staticmethod
+    def has_zero_diagonal(matrix):
+        return np.any(np.isclose(np.diag(matrix), 0.0))
+
+    @staticmethod
     def are_dimensions_compatible(A, b, x0):
         n = A.shape[0]
         return b.shape[0] == n and x0.shape[0] == n

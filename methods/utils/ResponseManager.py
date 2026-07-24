@@ -12,12 +12,13 @@ class ResponseManager:
         }
 
     @staticmethod
-    def warning_response(table, message=None):
+    def warning_response(table, message=None, headers=None):
         if not message:
             message = "The iterations limit was reached"
         return {
             "status": "warning",
             "message": f"Warning: {message}",
+            "table_headers": headers,
             "table": table,
         }
 
